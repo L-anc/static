@@ -1,5 +1,5 @@
 import tkinter as tk
-import time
+from time import sleep
 import random
 from PIL import Image, ImageTk, ImageDraw
 import sys
@@ -73,7 +73,15 @@ for coords in quadrant_coords:
             canvas.create_rectangle(line_pos, y0, line_pos+LINEWIDTH, y1, fill = 'black')
             line_pos += LINEWIDTH*2
 
-
-
+for i in range(10):
+    prob = i/10
+    print("Awaiting...")
+    sleep(10)
+    print("Generating static")
+    for x in range(0, XLIM, LINEWIDTH):
+        for y in range(0, YLIM, LINEWIDTH):
+            if random.random() < prob:
+                canvas.create_rectangle(x, y, x+LINEWIDTH, y+LINEWIDTH, fill = random.choice(['black', 'white']))
+    print("Done")
 
 root.mainloop()
