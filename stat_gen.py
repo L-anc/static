@@ -1,30 +1,24 @@
 import tkinter as tk
 import time
 import random
-from PIL import Image, ImageTk
-
-LINECNT = 10
-XLIM = 1500
-YLIM = 1000
-RECTH = int(YLIM/(LINECNT*2))
-
-root=tk.Tk()
-canvas=tk.Canvas(root,width=XLIM,height=YLIM)
-canvas.pack()
-
-static_bkgnd = Image.open("static_bkgnd.png")
-static_bkgnd = static_bkgnd.resize((XLIM*2, YLIM*2), Image.LANCZOS)
-static_bkgnd = ImageTk.PhotoImage(static_bkgnd)
+from PIL import Image, ImageTk, ImageDraw
+import sys
 
 
-# image_path = "your_image.jpg" 
-# image = Image.open(image_path)
-# photo_image = ImageTk.PhotoImage(image)
+# Tunable parameters
+LINECNT = 30
+XLIM = 400
+YLIM = 400
+LINEWIDTH = XLIM / (LINECNT*4)
 
-# background_label = tk.Label(window, image=photo_image)
-# background_label.place(x=0, y=0, relwidth=1, relheight=1)
-# background_label.image = photo_image
 
+
+# Utility functions
+def import_image(path):
+    image = Image.open(path)
+    # image = static_bkgnd.resize((XLIM*2, YLIM*2), Image.LANCZOS)
+    image = ImageTk.PhotoImage(image)
+    return image
 
 def generate_static(bounds):
     x0, y0, x1, y1 = bounds
@@ -39,20 +33,47 @@ def gen_static_collection(items):
         generate_static(item)
 
 
-cur_y = 0
-items = []
-for i in range(LINECNT):
-   items.append((0, cur_y, XLIM, cur_y+RECTH))
-   cur_y += 2*RECTH
+# Initialize canvas
+root=tk.Tk()
+canvas=tk.Canvas(root,width=XLIM,height=YLIM)
+canvas.pack()
 
 
+# cur_y = 0
+# items = []
+# for i in range(LINECNT):
+#    items.append((0, cur_y, XLIM, cur_y+RECTH))
+#    cur_y += 2*RECTH
 
-def redraw():
-   canvas.after(10,redraw)
-   gen_static_collection(items)
-   canvas.update()
+# def redraw():
+#    canvas.after(10,redraw)
+#    gen_static_collection(items)
+#    canvas.update()
 
 #generate_static((0, 0, XLIM, YLIM))
 # gen_static_collection(items)
-canvas.create_image(0, 0, image = static_bkgnd)
+
+# x, y coord arrays
+quadrant_coords = [[0, 0, XLIM/2, YLIM/2, True], 
+                   [XLIM/2, 0, XLIM, YLIM/2, False], 
+                   [0, YLIM/2, XLIM/2, YLIM, False],
+                   [XLIM/2, YLIM/2, XLIM, YLIM, True]]
+
+# generate initial McCollough test image
+for coords in quadrant_coords:
+    x0, y0, x1, y1, horiz = coords
+    if horiz:
+        line_pos = y0
+        for i in range(LINECNT):
+            canvas.create_rectangle(x0, line_pos, x1, line_pos+LINEWIDTH, fill = 'black')
+            line_pos += LINEWIDTH*2
+    else:
+        line_pos = x0
+        for i in range(LINECNT):
+            canvas.create_rectangle(line_pos, y0, line_pos+LINEWIDTH, y1, fill = 'black')
+            line_pos += LINEWIDTH*2
+
+
+
+
 root.mainloop()
